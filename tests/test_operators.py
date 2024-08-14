@@ -27,6 +27,9 @@ from minitorch.operators import (
 
 from .strategies import assert_close, small_floats
 
+# from strategies import assert_close, small_floats
+
+
 # ## Task 0.1 Basic hypothesis tests.
 
 
@@ -107,14 +110,22 @@ def test_sigmoid(a: float) -> None:
     * It crosses 0 at 0.5
     * It is  strictly increasing.
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    print(a)
+    assert sigmoid(a) >= 0.0
+    assert sigmoid(a) <= 1.0
+    assert (1 - sigmoid(a)) - sigmoid(-a) < 1e-6 and (1 - sigmoid(a)) - sigmoid(
+        -a
+    ) > -1e-6
+    assert sigmoid(0.0) == 0.5
+    assert sigmoid(a) <= sigmoid(a + 1.0)
+    assert sigmoid(a) >= sigmoid(a - 1.0)
 
 
 @pytest.mark.task0_2
 @given(small_floats, small_floats, small_floats)
 def test_transitive(a: float, b: float, c: float) -> None:
     "Test the transitive property of less-than (a < b and b < c implies a < c)"
-    raise NotImplementedError("Need to include this file from past assignment.")
+    assert lt(a, b) + lt(b, c) <= lt(a, c) + 1.0
 
 
 @pytest.mark.task0_2
@@ -123,7 +134,11 @@ def test_symmetric() -> None:
     Write a test that ensures that :func:`minitorch.operators.mul` is symmetric, i.e.
     gives the same value regardless of the order of its input.
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    assert mul(1.0, 2.0) == mul(2.0, 1.0)
+    assert mul(1000.0, 0.0) == mul(0.0, 1000.0)
+    assert mul(2000.0, 10000.0) == mul(10000.0, 2000.0)
+    assert mul(-1.0, 2.5) == mul(2.5, -1.0)
+    assert mul(-5.0, -1.0) == mul(-1.0, -5.0)
 
 
 @pytest.mark.task0_2
@@ -132,15 +147,24 @@ def test_distribute() -> None:
     Write a test that ensures that your operators distribute, i.e.
     :math:`z \times (x + y) = z \times x + z \times y`
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    assert mul(2.0, add(1.0, 2.0)) == add(mul(2.0, 1.0), mul(2.0, 2.0))
+    assert mul(0.0, add(1.0, 2.0)) == add(mul(0.0, 1.0), mul(0.0, 2.0))
+    assert mul(-5.5, add(1.0, 2.0)) == add(mul(-5.5, 1.0), mul(-5.5, 2.0))
+    assert mul(2.4, add(-1.0, 2.0)) == add(mul(2.4, -1.0), mul(2.4, 2.0))
 
 
 @pytest.mark.task0_2
 def test_other() -> None:
     """
     Write a test that ensures some other property holds for your functions.
+
+    Test that inv_back works
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    assert inv_back(2.0, 2.0) == -0.5
+    assert inv_back(2.0, 2.0) < inv_back(3.0, 2.0)
+    assert inv_back(-2.0, -2.0) > inv_back(-3.0, -2.0)
+    assert inv_back(-2.0, 2.0) < inv_back(-3.0, 2.0)
+    assert inv_back(2.0, 2.0) == -1 * inv_back(2.0, -2.0)
 
 
 # ## Task 0.3  - Higher-order functions
@@ -167,8 +191,16 @@ def test_sum_distribute(ls1: List[float], ls2: List[float]) -> None:
     """
     Write a test that ensures that the sum of `ls1` plus the sum of `ls2`
     is the same as the sum of each element of `ls1` plus each element of `ls2`.
+
+    Args:
+        ls1: List[float]
+        ls2: List[float]
+
+    Returns:
+        None
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+
+    assert_close(sum(ls1) + sum(ls2), sum([x + y for x, y in zip(ls1, ls2)]))
 
 
 @pytest.mark.task0_3
